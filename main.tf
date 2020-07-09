@@ -1,7 +1,7 @@
 terraform {
   backend "remote" {
     hostname     = "app.terraform.io"
-    organization = "wallex-hashicorp"
+    organization = "tbicommons"
 
     workspaces {
       name = "learn-terraform-circleci"
