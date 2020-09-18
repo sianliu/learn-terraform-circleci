@@ -2,18 +2,18 @@ terraform {
   required_providers {
     aws = {
       source = "hashicorp/aws"
-//      profile = "wallex-dev"
+      //      profile = "wallex-dev"
     }
   }
   backend "s3" {
     bucket = "ff8cb482-660d-40ec-cfbb-72e7e675a7c2-backend"
-    key    = "terraform/webapp/terraform.tfstate"
+    key    = "terraform.tfstate"
     region = "ap-southeast-1"
   }
 }
 
 provider "aws" {
-  region = var.region
+  region  = var.region
   profile = "wallex-dev"
 }
 
