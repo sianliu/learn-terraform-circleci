@@ -1,16 +1,30 @@
 terraform {
-  backend "remote" {
-    hostname     = "app.terraform.io"
-    organization = "tbicommons"
-
-    workspaces {
-      name = "learn-terraform-circleci"
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
     }
+  }
+  backend "s3" {
+    bucket = "tf-test-d7d89193-84f4-903b-ff61-5cef9e565e11-backend"
+    key = "terraform/webapp/terraform.tfstate"
+    region = "ap-southeast-1"
   }
 }
 
+//terraform {
+//  backend "remote" {
+//    hostname     = "app.terraform.io"
+//    organization = "wallex"
+//
+//    workspaces {
+//      name = "learn-terraform-circleci"
+//    }
+//  }
+//}
+
 provider "aws" {
   region = var.region
+//  region = "ap-southeast-1"
 }
 
 provider "template" {
