@@ -38,7 +38,7 @@ jobs:
       -
         run:
           command: |
-            terraform init -backend-config="bucket=01535325-2b87-3c79-b86f-e9c07720cc11-backend" -backend-config="key=terraform.tfstate" -backend-config="region=ap-southeast-1" backend=true -force-copy -get=true -input=false
+            terraform init -backend-config=terraform_state_backend_config_file
             terraform plan -out tfapply -var-file variables.tfvars
           name: "terraform init & plan"
       -
