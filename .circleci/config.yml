@@ -1,85 +1,94 @@
-version: 2
-
+---
 jobs:
-  plan-apply:
-    working_directory: /tmp/project
-    docker:
-      - image: hashicorp/terraform:light
-    steps:
-      - checkout
-      - run:
-          name: terraform init & plan
-          command: |
-            terraform init -backend-config="bucket=01535325-2b87-3c79-b86f-e9c07720cc11-backend" -backend-config="key=terraform.tfstate" -backend-config="region=ap-southeast-1" backend=true -force-copy -get=true -input=false
-#            terraform init \
-#              -backend-config="aws_access_key=$AWS_ACCESS_KEY" /
-#              -backend-config="aws_secret_key=$AWS_SECRET_KEY"
-            terraform plan -out tfapply -var-file variables.tfvars
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
-
   apply:
     docker:
-      - image: hashicorp/terraform:light
+      -
+        image: "hashicorp/terraform:light"
     steps:
-      - attach_workspace:
-          at: .
-      - run:
+      -
+        attach_workspace:
+          at: "."
+      -
+        run:
+          command: "terraform apply -auto-approve tfapply\n"
           name: terraform
-          command: |
-            terraform apply -auto-approve tfapply
-      - persist_to_workspace:
-          root: .
+      -
+        persist_to_workspace:
           paths:
-            - .
-
-  plan-destroy:
-    docker:
-      - image: hashicorp/terraform:light
-    steps:
-      - attach_workspace:
-          at: .
-      - run:
-          name: terraform create destroy plan
-          command: |
-            terraform plan -destroy -out tfdestroy -var-file variables.tfvars
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
-
+            - "."
+          root: "."
   destroy:
     docker:
-      - image: hashicorp/terraform:light
+      -
+        image: "hashicorp/terraform:light"
     steps:
-      - attach_workspace:
-          at: .
-      - run:
-          name: terraform destroy
+      -
+        attach_workspace:
+          at: "."
+      -
+        run:
+          command: "terraform apply -auto-approve tfdestroy\n"
+          name: "terraform destroy"
+  plan-apply:
+    docker:
+      -
+        image: "hashicorp/terraform:light"
+    steps:
+      - checkout
+      -
+        run:
           command: |
-            terraform apply -auto-approve tfdestroy
-
+            terraform init -backend-config="bucket=01535325-2b87-3c79-b86f-e9c07720cc11-backend" -backend-config="key=terraform.tfstate" -backend-config="region=ap-southeast-1" backend=true -force-copy -get=true -input=false
+            terraform plan -out tfapply -var-file variables.tfvars
+          name: "terraform init & plan"
+      -
+        persist_to_workspace:
+          paths:
+            - "."
+          root: "."
+    working_directory: /tmp/project
+  plan-destroy:
+    docker:
+      -
+        image: "hashicorp/terraform:light"
+    steps:
+      -
+        attach_workspace:
+          at: "."
+      -
+        run:
+          command: "terraform plan -destroy -out tfdestroy -var-file variables.tfvars\n"
+          name: "terraform create destroy plan"
+      -
+        persist_to_workspace:
+          paths:
+            - "."
+          root: "."
+version: 2
 workflows:
-  version: 2
   plan_approve_apply:
     jobs:
       - plan-apply
-      - hold-apply:
-          type: approval
+      -
+        hold-apply:
           requires:
             - plan-apply
-      - apply:
+          type: approval
+      -
+        apply:
           requires:
             - hold-apply
-      - plan-destroy:
+      -
+        plan-destroy:
           requires:
             - apply
-      - hold-destroy:
-          type: approval
+      -
+        hold-destroy:
           requires:
             - plan-destroy
-      - destroy:
+          type: approval
+      -
+        destroy:
           requires:
             - hold-destroy
+  version: 2
