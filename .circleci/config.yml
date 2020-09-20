@@ -11,8 +11,13 @@ jobs:
           name: terraform init & plan
           command: |
             terraform init \
-              -backend-config="aws_access_key=$AWS_ACCESS_KEY"
-              -backend-config="aws_secret_key=$AWS_SECRET_KEY"
+              -backend-config="bucket=01535325-2b87-3c79-b86f-e9c07720cc11-backend" \
+              -backend-config="key=terraform.tfstate" \
+              -backend-config="region=ap-southeast-1" \
+              -backend=true -force-copy -get=true -input=false
+#            terraform init \
+#              -backend-config="aws_access_key=$AWS_ACCESS_KEY" /
+#              -backend-config="aws_secret_key=$AWS_SECRET_KEY"
             terraform plan -out tfapply -var-file variables.tfvars
       - persist_to_workspace:
           root: .
