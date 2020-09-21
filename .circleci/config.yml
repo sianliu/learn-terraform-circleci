@@ -77,7 +77,7 @@ workflows:
       - environment-setup:
       - plan-apply:
           requires:
-            -  environment-setup
+            - environment-setup
       - hold-apply:
           type: approval
           requires:
