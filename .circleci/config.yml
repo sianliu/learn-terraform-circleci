@@ -12,6 +12,7 @@ jobs:
             echo 'export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID' >> $BASH_ENV
             echo 'export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY' >> $BASH_ENV
             source $BASH_ENV
+
   plan-apply:
     working_directory: /tmp/project
     docker:
@@ -75,6 +76,8 @@ workflows:
     jobs:
       - environment-setup:
       - plan-apply:
+          requires:
+            -  environment-setup
       - hold-apply:
           type: approval
           requires:
