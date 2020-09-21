@@ -1,94 +1,91 @@
----
+version: 2
+
 jobs:
-  apply:
+  build:
     docker:
-      -
-        image: "hashicorp/terraform:light"
-    steps:
-      -
-        attach_workspace:
-          at: "."
-      -
-        run:
-          command: "terraform apply -auto-approve tfapply\n"
-          name: terraform
-      -
-        persist_to_workspace:
-          paths:
-            - "."
-          root: "."
-  destroy:
-    docker:
-      -
-        image: "hashicorp/terraform:light"
-    steps:
-      -
-        attach_workspace:
-          at: "."
-      -
-        run:
-          command: "terraform apply -auto-approve tfdestroy\n"
-          name: "terraform destroy"
-  plan-apply:
-    docker:
-      -
-        image: "hashicorp/terraform:light"
+      - image: wallextech/wallex-pipelines-docker:10.15-ci
     steps:
       - checkout
-      -
-        run:
+      - run:
+          name: "echo an env var that is part of our project"
           command: |
-            terraform init -backend-config=terraform_state_backend_config_file
-            terraform plan -out tfapply -var-file variables.tfvars
-          name: "terraform init & plan"
-      -
-        persist_to_workspace:
-          paths:
-            - "."
-          root: "."
+            echo $AWS_ACCESS_KEY_ID
+  plan-apply:
     working_directory: /tmp/project
+    docker:
+      - image: hashicorp/terraform:light
+    steps:
+      - checkout
+      - run:
+          name: terraform init & plan
+          command: |
+            terraform init -input=false
+            terraform plan -out tfapply -var-file variables.tfvars
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+
+  apply:
+    docker:
+      - image: hashicorp/terraform:light
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: terraform
+          command: |
+            terraform apply -auto-approve tfapply
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+
   plan-destroy:
     docker:
-      -
-        image: "hashicorp/terraform:light"
+      - image: hashicorp/terraform:light
     steps:
-      -
-        attach_workspace:
-          at: "."
-      -
-        run:
-          command: "terraform plan -destroy -out tfdestroy -var-file variables.tfvars\n"
-          name: "terraform create destroy plan"
-      -
-        persist_to_workspace:
+      - attach_workspace:
+          at: .
+      - run:
+          name: terraform create destroy plan
+          command: |
+            terraform plan -destroy -out tfdestroy -var-file variables.tfvars
+      - persist_to_workspace:
+          root: .
           paths:
-            - "."
-          root: "."
-version: 2
+            - .
+
+  destroy:
+    docker:
+      - image: hashicorp/terraform:light
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: terraform destroy
+          command: |
+            terraform apply -auto-approve tfdestroy
+
 workflows:
+  version: 2
   plan_approve_apply:
     jobs:
       - plan-apply
-      -
-        hold-apply:
+      - hold-apply:
+          type: approval
           requires:
             - plan-apply
-          type: approval
-      -
-        apply:
+      - apply:
           requires:
             - hold-apply
-      -
-        plan-destroy:
+      - plan-destroy:
           requires:
             - apply
-      -
-        hold-destroy:
+      - hold-destroy:
+          type: approval
           requires:
             - plan-destroy
-          type: approval
-      -
-        destroy:
+      - destroy:
           requires:
             - hold-destroy
-  version: 2
