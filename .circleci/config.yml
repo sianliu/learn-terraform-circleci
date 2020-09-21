@@ -1,18 +1,6 @@
 version: 2
 
 jobs:
-  environment-setup:
-    docker:
-      - image: wallextech/wallex-pipelines-docker:10.15-ci
-    steps:
-      - checkout
-      - run:
-          name: "Define Dev Environment Variables at Runtime"
-          command: |
-            echo 'export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID' >> $BASH_ENV
-            echo 'export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY' >> $BASH_ENV
-            source $BASH_ENV
-
   plan-apply:
     working_directory: /tmp/project
     docker:
@@ -22,7 +10,7 @@ jobs:
       - run:
           name: terraform init & plan
           command: |
-            terraform init -backend-config=terraform_state_backend_config_file
+            terraform init -input=false
             terraform plan -out tfapply -var-file variables.tfvars
       - persist_to_workspace:
           root: .
@@ -74,10 +62,7 @@ workflows:
   version: 2
   plan_approve_apply:
     jobs:
-      - environment-setup:
-      - plan-apply:
-          requires:
-            - environment-setup
+      - plan-apply
       - hold-apply:
           type: approval
           requires:
