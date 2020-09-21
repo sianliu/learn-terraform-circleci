@@ -19,7 +19,7 @@ jobs:
       - run:
           name: terraform init & plan
           command: |
-            terraform init -input=false
+            terraform init -backend-config=terraform_state_backend_config_file
             terraform plan -out tfapply -var-file variables.tfvars
       - persist_to_workspace:
           root: .
@@ -71,6 +71,7 @@ workflows:
   version: 2
   plan_approve_apply:
     jobs:
+      - build
       - plan-apply
       - hold-apply:
           type: approval
