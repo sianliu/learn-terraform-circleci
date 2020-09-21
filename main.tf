@@ -4,13 +4,13 @@ terraform {
       source = "hashicorp/aws"
     }
   }
-//  backend "s3" {
-//    bucket = "01535325-2b87-3c79-b86f-e9c07720cc11-backend"
-//    key    = "terraform.tfstate"
-//    region = "ap-southeast-1"
-//  }
+  backend "s3" {
+    bucket = "01535325-2b87-3c79-b86f-e9c07720cc11-backend"
+    key    = "terraform.tfstate"
+    region = "ap-southeast-1"
+  }
   # Partial configuration - define parameters on command line with terraform init
-  backend "s3" {}
+//  backend "s3" {}
 }
 
 provider "aws" {
