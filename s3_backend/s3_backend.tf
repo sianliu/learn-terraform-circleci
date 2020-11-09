@@ -42,19 +42,17 @@ resource "aws_s3_bucket_policy" "wallex-dev-bucket-policy" {
         {
           Effect : "Allow",
           Action : "s3:ListBucket",
-          Resource : "arn:aws:s3:::mybucket"
+          Resource : "${aws_s3_bucket.terraform_state.arn}"
           Principal = {
-            //            AWS = "arn:aws:iam::821353914239:role/OrganizationAccountAccessRole"
-            AWS = "arn:aws:iam::821353914239:user/jonathan"
+            AWS = "arn:aws:iam::821353914239:role/OrganizationAccountAccessRole"
           }
         },
         {
           Effect : "Allow",
           Action : ["s3:GetObject", "s3:PutObject"],
-          Resource : "arn:aws:s3:::mybucket/path/to/my/key"
+          Resource : "${aws_s3_bucket.terraform_state.arn}/*"
           Principal = {
             AWS = "arn:aws:iam::821353914239:role/OrganizationAccountAccessRole"
-            //            AWS = "arn:aws:iam::821353914239:user/jonathan"
           }
         }
       ]
