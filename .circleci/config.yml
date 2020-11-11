@@ -1,8 +1,8 @@
 version: '2.1'
 
 orbs:
-  terraform: 'circleci/terraform@dev:alpha'
-  
+  terraform: 'circleci/terraform@1.1.0'
+
 workflows:
   deploy_infrastructure:
     jobs:
