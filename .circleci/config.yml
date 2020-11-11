@@ -1,12 +1,15 @@
 version: 2.1
 
-jobs:
-  Hello-World:
+defaults: &defaults
     docker:
       - image: alpine:3.7
         auth:
           username: mydockerhub-user
-          password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
+          password: $DOCKERHUB_PASSWORD
+
+jobs:
+  Hello-World:
+    <<: *defaults
     steps:
       - run:
           name: The First Step
@@ -15,11 +18,7 @@ jobs:
             echo 'This is the delivery pipeline'
 
   I-Have-Code:
-    docker:
-      - image: alpine:3.7
-        auth:
-          username: mydockerhub-user
-          password: $DOCKERHUB_PASSWORD
+    <<: *defaults
     steps:
       - checkout
       - run:
@@ -29,22 +28,14 @@ jobs:
             echo '^^^That should look familiar^^^'
 
   Run-With-Node:
-    docker:
-      - image: circleci/node:10-browsers
-        auth:
-          username: mydockerhub-user
-          password: $DOCKERHUB_PASSWORD
+    <<: *defaults
     steps:
       - run:
           name: Running in a unique container
           command: node -v
 
   Now-Complete:
-    docker:
-      - image: alpine:3.7
-        auth:
-          username: mydockerhub-user
-          password: $DOCKERHUB_PASSWORD
+    <<: *defaults
     steps:
       - run:
           name: Approval Complete
