@@ -30,7 +30,7 @@ jobs:
 
   Run-With-Node:
     docker:
-      - image: alpine:3.7
+      - image: circleci/node:10-browsers
         auth:
           username: mydockerhub-user
           password: $DOCKERHUB_PASSWORD
@@ -68,4 +68,4 @@ workflows:
             - I-Have-Code
       - Now-Complete:
           requires:
-            - Hold-For-Approval 
+            - Hold-For-Approval
