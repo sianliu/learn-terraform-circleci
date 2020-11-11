@@ -1,20 +1,28 @@
-version: '2.1'
-
-orbs:
-  terraform: circleci/terraform@1.1.0
-
-jobs:
-  single-job-lifecycle:
-    executor: terraform/default
-    steps:
-      - checkout
-      - terraform/init:
-      - terraform/plan:
-      - terraform/apply:
-      - terraform/destroy:
-    working_directory: ~/src
-
-workflows:
-  single-job-lifecycle:
-    jobs:
-      - single-job-lifecycle
+description: |
+  Deploy infrastructure by leveraging a sequence of commands to create and apply subseqent terraform plan.
+usage:
+  version: 2.1
+  orbs:
+    terraform: circleci/terraform@x.y.z
+  jobs:
+    single-job-lifecycle:
+      executor: terraform/default
+      working_directory: "~/src"
+      steps:
+        - checkout
+        - terraform/init:
+            path: "."
+        - terraform/validate:
+            path: "."
+        - terraform/fmt:
+            path: "."
+        - terraform/plan:
+            path: "."
+        - terraform/apply:
+            path: "."
+        - terraform/destroy:
+            path: "."
+  workflows:
+    single-job-lifecycle:
+      jobs:
+        - single-job-lifecycle
